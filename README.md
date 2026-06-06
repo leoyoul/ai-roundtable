@@ -1,0 +1,129 @@
+# AI 圆桌会议
+
+AI 圆桌会议是一个本地运行的 AI 智囊团会议工具。
+
+它的初衷很简单：很多问题不适合只问一个 AI。做产品、做项目、做经营决策时，我们更需要一组立场不同、身份不同、关注点不同的“虚拟参会人”一起讨论。你可以把它们配置成 CEO、CTO、CFO、市场负责人、法务、产品经理、架构师，也可以配置成任何你需要的角色，让它们围绕同一个主题多轮发言、相互补充、暴露分歧，最后沉淀成可导出的会议结论。
+
+这个项目优先面向本地部署和个人/小团队使用。模型可以来自云端 OpenAI 兼容接口，也可以来自本地模型服务。会议数据保存在本地 SQLite 中，API Key 只在本地加密保存，不会在页面或导出内容里暴露。
+
+## 功能
+
+- AI 智囊团：为每个参会模型设置名称、身份和思考角度。
+- 任意身份：支持 CEO、CTO、CFO、市场、产品、法务、专家顾问等自定义角色。
+- 多轮会议：围绕一个主题自动组织多模型讨论。
+- 人工介入：会议中可以停止、继续、插话和补充上下文。
+- 会议沉淀：导出 Markdown 和 JSON，便于复盘和整理。
+- 本地优先：SQLite 持久化，API Key 本地加密保存。
+- Docker 部署：支持本地 Docker Compose 一键启动。
+
+## 适合场景
+
+- 产品创意评审
+- 商业模式讨论
+- 技术方案评审
+- 成本和 ROI 评估
+- 风险、法务、合规视角补充
+- 个人决策前的多角色推演
+- 小团队异步头脑风暴
+
+## 本地开发
+
+```bash
+npm install
+npm run dev
+```
+
+访问：
+
+```text
+http://localhost:3000
+```
+
+常用命令：
+
+```bash
+npm run build
+npm test
+```
+
+## Docker 运行
+
+复制环境变量模板：
+
+```bash
+cp .env.example .env
+```
+
+建议在 `.env` 中设置 `AI_ROUNDTABLE_SECRET`。这是 API Key 的本地加密密钥，换掉它会导致旧密文无法解密。
+
+启动：
+
+```bash
+docker compose up -d --build
+```
+
+访问：
+
+```text
+http://localhost:3000
+```
+
+如果本机 3000 已被占用：
+
+```bash
+APP_PORT=3001 docker compose up -d --build
+```
+
+访问：
+
+```text
+http://localhost:3001
+```
+
+停止：
+
+```bash
+docker compose down
+```
+
+同时删除 Docker 数据卷：
+
+```bash
+docker compose down -v
+```
+
+## 数据和密钥
+
+默认数据目录：
+
+- 本地开发：`data/`
+- Docker：项目目录下的 `data/` 会挂载到容器 `/app/data`
+
+不要把以下内容提交到 GitHub：
+
+- `data/`
+- `.env`
+- `.env.local`
+- `data/secret.key`
+- SQLite 数据库文件
+
+API Key 存储说明：
+
+- 应用不会在接口中返回明文 API Key。
+- 编辑模型时，API Key 留空表示保留原 Key。
+- 勾选清空 Key 才会删除原 Key。
+- 如果 `AI_ROUNDTABLE_SECRET` 或 `data/secret.key` 变化，旧 API Key 密文将无法解密，需要重新输入。
+
+## 开源仓库数据说明
+
+本仓库不包含任何示例数据库、模型账号、API Key 或会议数据。首次启动时应用会自动创建空数据库。
+
+如果你要发布自己的 fork，请确认以下文件没有被提交：
+
+```bash
+git check-ignore -v data/secret.key data/ai-roundtable.sqlite .env .env.local
+```
+
+## License
+
+MIT
